@@ -4,8 +4,6 @@ extern crate pretty_env_logger;
 #[macro_use]
 extern crate log;
 
-// TODO: import log, pretty_env_logger, dotenv, and PgPoolOptions
-
 mod cors;
 mod handlers;
 mod models;
@@ -16,6 +14,10 @@ use std::env;
 
 use cors::*;
 use handlers::*;
+use persistance::{
+    answers_dao::{AnswersDao, AnswersDaoImpl},
+    questions_dao::*,
+};
 
 #[launch]
 async fn rocket() -> _ {
@@ -28,6 +30,9 @@ async fn rocket() -> _ {
         .connect(&db)
         .await
         .expect("Failed to setup DB pool");
+
+    let questions_dao = Box::new(QuestionsDaoImpl::new(pool.clone()));
+    let answers_dao = Box::new(AnswersDaoImpl::new(pool.clone()));
 
     rocket::build()
         .mount(
@@ -42,4 +47,6 @@ async fn rocket() -> _ {
             ],
         )
         .attach(CORS)
+        .manage(questions_dao as Box<dyn QuestionsDao + Send + Sync>)
+        .manage(answers_dao as Box<dyn AnswersDao + Send + Sync>)
 }
