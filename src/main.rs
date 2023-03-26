@@ -9,6 +9,7 @@ extern crate log;
 mod cors;
 mod handlers;
 mod models;
+mod persistance;
 
 use sqlx::postgres::PgPoolOptions;
 use std::env;
@@ -27,17 +28,6 @@ async fn rocket() -> _ {
         .connect(&db)
         .await
         .expect("Failed to setup DB pool");
-
-    // Using slqx, execute a SQL query that selects all questions from the questions table.
-    // Use the `unwrap` or `expect` method to handle errors. This is just some test code to
-    // make sure we can connect to the database.
-    let recs = sqlx::query!("SELECT * FROM questions")
-        .fetch_all(&pool)
-        .await
-        .expect("Could load questions");
-
-    info!("********* Question Records *********");
-    info!("{:?}", recs);
 
     rocket::build()
         .mount(
