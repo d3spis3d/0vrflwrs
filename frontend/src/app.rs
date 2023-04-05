@@ -1,3 +1,4 @@
+use crate::pages::{home::Home, question::Question};
 use yew::prelude::*;
 use yew_router::prelude::*;
 
@@ -5,13 +6,14 @@ use yew_router::prelude::*;
 enum Route {
     #[at("/")]
     Home,
+    #[at("/question/:id")]
+    Question { id: String },
 }
 
 fn switch(routes: Route) -> Html {
     match routes {
-        Route::Home => html! {
-            <h1>{ "Welcome to 0vrflwrs" }</h1>
-        },
+        Route::Home => html! { <Home /> },
+        Route::Question { id } => html! { <Question id={id} /> },
     }
 }
 
