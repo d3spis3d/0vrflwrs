@@ -46,6 +46,16 @@ pub async fn read_questions(
     Ok(Json(questions))
 }
 
+#[get("/question/<question_uuid>")]
+pub async fn read_question(
+    question_uuid: &str,
+    questions_dao: &State<Box<dyn QuestionsDao + Sync + Send>>,
+) -> Result<Json<QuestionDetail>, APIError> {
+    let question = handlers_inner::read_question(question_uuid, questions_dao).await?;
+
+    Ok(Json(question))
+}
+
 #[delete("/question", data = "<question_uuid>")]
 pub async fn delete_question(
     question_uuid: Json<QuestionId>,
@@ -66,12 +76,15 @@ pub async fn create_answer(
     Ok(Json(answer_detail))
 }
 
-#[get("/answers", data = "<question_uuid>")]
+#[get("/question/<question_uuid>/answers")]
 pub async fn read_answers(
-    question_uuid: Json<QuestionId>,
+    question_uuid: &str,
     answers_dao: &State<Box<dyn AnswersDao + Send + Sync>>,
 ) -> Result<Json<Vec<AnswerDetail>>, APIError> {
-    let answers = handlers_inner::read_answers(question_uuid.into_inner(), answers_dao).await?;
+    let question_id = QuestionId {
+        question_uuid: question_uuid.to_owned(),
+    };
+    let answers = handlers_inner::read_answers(question_id, answers_dao).await?;
 
     Ok(Json(answers))
 }

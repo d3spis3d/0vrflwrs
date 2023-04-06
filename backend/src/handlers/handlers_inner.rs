@@ -45,6 +45,21 @@ pub async fn read_questions(
     }
 }
 
+pub async fn read_question(
+    question_uuid: &str,
+    questions_dao: &Box<dyn QuestionsDao + Sync + Send>,
+) -> Result<QuestionDetail, HandlerError> {
+    let question = questions_dao.get_question(question_uuid).await;
+
+    match question {
+        Ok(question) => Ok(question),
+        Err(err) => {
+            error!("Error reading question: {}", err);
+            Err(HandlerError::default_internal_error())
+        }
+    }
+}
+
 pub async fn delete_question(
     question_uuid: QuestionId,
     questions_dao: &Box<dyn QuestionsDao + Sync + Send>,

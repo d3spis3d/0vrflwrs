@@ -36,10 +36,11 @@ async fn rocket() -> _ {
 
     rocket::build()
         .mount(
-            "/",
+            "/api/v1",
             routes![
                 create_question,
                 read_questions,
+                read_question,
                 delete_question,
                 create_answer,
                 read_answers,

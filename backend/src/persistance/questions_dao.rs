@@ -8,6 +8,7 @@ pub trait QuestionsDao {
     async fn create_question(&self, question: Question) -> Result<QuestionDetail, DBError>;
     async fn delete_question(&self, question_uuid: String) -> Result<(), DBError>;
     async fn get_questions(&self) -> Result<Vec<QuestionDetail>, DBError>;
+    async fn get_question(&self, question_uuid: &str) -> Result<QuestionDetail, DBError>;
 }
 
 pub struct QuestionsDaoImpl {
@@ -73,5 +74,22 @@ impl QuestionsDao for QuestionsDaoImpl {
             .collect();
 
         Ok(questions)
+    }
+
+    async fn get_question(&self, question_uuid: &str) -> Result<QuestionDetail, DBError> {
+        let uuid = sqlx::types::Uuid::parse_str(&question_uuid)
+            .map_err(|_| DBError::InvalidUUID(question_uuid.to_owned()))?;
+
+        let record = sqlx::query!("SELECT * FROM questions WHERE question_uuid = $1", uuid)
+            .fetch_one(&self.db)
+            .await
+            .map_err(|e| DBError::Other(Box::new(e)))?;
+
+        Ok(QuestionDetail {
+            question_uuid: record.question_uuid.to_string(),
+            title: record.title,
+            description: record.description,
+            created_at: record.created_at.to_string(),
+        })
     }
 }
