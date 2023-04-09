@@ -79,6 +79,7 @@ pub fn home() -> Html {
     html! {
         <>
             <h1>{ "Welcome to 0vrflwrs" }</h1>
+            <hr />
             <QuestionList questions={(*questions).clone()} />
         </>
     }

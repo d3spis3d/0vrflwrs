@@ -1,5 +1,4 @@
-use crate::pages::{home::Home, question::Question};
-use common::QuestionDetail;
+use crate::pages::{create::Create, home::Home, question::Question};
 use yew::prelude::*;
 use yew_router::prelude::*;
 
@@ -7,12 +6,15 @@ use yew_router::prelude::*;
 pub enum Route {
     #[at("/")]
     Home,
+    #[at("/question")]
+    Create,
     #[at("/question/:id")]
     Question { id: String },
 }
 
 fn switch(routes: Route) -> Html {
     match routes {
+        Route::Create => html! { <Create /> },
         Route::Home => html! { <Home /> },
         Route::Question { id } => html! { <Question id={id} /> },
     }
